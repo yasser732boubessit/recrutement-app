@@ -1,0 +1,342 @@
+/* Professional Portfolio Animations - Corrected Version */
+@import "tailwindcss";
+
+/* ===== VARIABLES GLOBALES ===== */
+:root {
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  
+  /* Z-index layers */
+  --z-dropdown: 50;
+  --z-sticky: 40;
+  --z-modal: 100;
+  --z-popover: 75;
+  --z-tooltip: 60;
+}
+
+/* ===== BASE STYLES ===== */
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+  
+  :focus-visible {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+  }
+  
+  /* Assurer que les boutons restent cliquables */
+  button, 
+  select,
+  [role="button"],
+  .cursor-pointer {
+    position: relative;
+    z-index: 10;
+    pointer-events: auto !important;
+  }
+  
+  /* Éviter que les overlays d'animation bloquent les clics */
+  .absolute,
+  .fixed {
+    pointer-events: none;
+  }
+  
+  /* Mais permettre aux éléments interactifs d'être cliquables */
+  .absolute button,
+  .fixed button,
+  .absolute select,
+  .fixed select,
+  .absolute a,
+  .fixed a {
+    pointer-events: auto;
+  }
+}
+
+/* ===== UTILITIES ===== */
+@layer utilities {
+  /* Layout */
+  .page-container { 
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8; 
+  }
+  
+  .section-container { 
+    @apply bg-white rounded-xl shadow-sm p-4 md:p-6; 
+  }
+  
+  .grid-cards { 
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6; 
+  }
+  
+  .state-loading { 
+    @apply flex justify-center items-center py-12; 
+  }
+  
+  .state-error { 
+    @apply bg-red-50 text-red-600 p-4 rounded-lg text-sm; 
+  }
+  
+  .state-empty { 
+    @apply text-center py-12 text-gray-500 text-sm; 
+  }
+
+  /* ===== HOVER & FOCUS EFFECTS ===== */
+  .hover-lift { 
+    transition: transform 0.2s ease-out;
+    will-change: transform;
+  }
+  
+  .hover-lift:hover { 
+    transform: translateY(-2px); 
+  }
+  
+  /* Version plus forte pour les cards */
+  .hover-lift-strong:hover { 
+    transform: translateY(-4px); 
+  }
+
+  /* Hover underline sans bloquer les clics */
+  .hover-underline { 
+    position: relative;
+    display: inline-block;
+  }
+  
+  .hover-underline::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background: linear-gradient(to right, #3b82f6, #8b5cf6);
+    transition: width 0.2s ease;
+    pointer-events: none; /* Important: ne pas bloquer les clics */
+  }
+  
+  .hover-underline:hover::after { 
+    width: 100%; 
+  }
+
+  /* ===== ANIMATIONS ===== */
+  .animate-fade-in { 
+    animation: fade-in 0.5s ease-out forwards; 
+  }
+  
+  .animate-fade-out { 
+    animation: fade-out 0.3s ease-out forwards; 
+  }
+  
+  .animate-fade-in-up { 
+    animation: fade-in-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
+  }
+  
+  .animate-slide-in-left { 
+    animation: slide-in-left 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
+  }
+  
+  .animate-slide-in-right { 
+    animation: slide-in-right 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
+  }
+  
+  .animate-scale-in { 
+    animation: scale-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
+  }
+  
+  .animate-subtle-float { 
+    animation: subtle-float 6s ease-in-out infinite; 
+  }
+  
+  .animate-gentle-pulse { 
+    animation: gentle-pulse 4s ease-in-out infinite; 
+  }
+  
+  .animate-toggle-dark { 
+    animation: toggle-dark 0.3s ease-in-out; 
+  }
+  
+  .animate-slideDown { 
+    animation: slide-down 0.3s ease-out forwards; 
+  }
+
+  /* ===== ANIMATIONS RÉDUITES ===== */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in,
+    .animate-fade-out,
+    .animate-fade-in-up,
+    .animate-slide-in-left,
+    .animate-slide-in-right,
+    .animate-scale-in,
+    .animate-subtle-float,
+    .animate-gentle-pulse,
+    .animate-toggle-dark,
+    .animate-slideDown,
+    .hover-lift,
+    .hover-lift-strong {
+      animation: none !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+}
+
+/* ===== KEYFRAMES ===== */
+@keyframes fade-in { 
+  from { opacity: 0; } 
+  to { opacity: 1; } 
+}
+
+@keyframes fade-out { 
+  from { opacity: 1; } 
+  to { opacity: 0; } 
+}
+
+@keyframes fade-in-up { 
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  } 
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  } 
+}
+
+@keyframes slide-in-left { 
+  from { 
+    opacity: 0; 
+    transform: translateX(-20px); 
+  } 
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  } 
+}
+
+@keyframes slide-in-right { 
+  from { 
+    opacity: 0; 
+    transform: translateX(20px); 
+  } 
+  to { 
+    opacity: 1; 
+    transform: translateX(0); 
+  } 
+}
+
+@keyframes scale-in { 
+  from { 
+    opacity: 0; 
+    transform: scale(0.98); 
+  } 
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  } 
+}
+
+@keyframes subtle-float { 
+  0%, 100% { transform: translateY(0); } 
+  50% { transform: translateY(-4px); } 
+}
+
+@keyframes gentle-pulse { 
+  0%, 100% { opacity: 1; } 
+  50% { opacity: 0.9; } 
+}
+
+@keyframes toggle-dark { 
+  0% { transform: scale(1); } 
+  50% { transform: scale(1.05); } 
+  100% { transform: scale(1); } 
+}
+
+@keyframes slide-down { 
+  from { 
+    opacity: 0; 
+    transform: translateY(-10px); 
+  } 
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  } 
+}
+
+@keyframes logo-spin { 
+  from { transform: rotate(0deg); } 
+  to { transform: rotate(360deg); } 
+}
+
+/* ===== STAGGERED ANIMATIONS ===== */
+.stagger-animation > * { 
+  opacity: 0; 
+  animation: fade-in-up 0.5s cubic-bezier(0.25,0.46,0.45,0.94) forwards; 
+}
+
+.stagger-animation > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-animation > *:nth-child(2) { animation-delay: 0.15s; }
+.stagger-animation > *:nth-child(3) { animation-delay: 0.2s; }
+.stagger-animation > *:nth-child(4) { animation-delay: 0.25s; }
+.stagger-animation > *:nth-child(5) { animation-delay: 0.3s; }
+.stagger-animation > *:nth-child(6) { animation-delay: 0.35s; }
+.stagger-animation > *:nth-child(7) { animation-delay: 0.4s; }
+.stagger-animation > *:nth-child(8) { animation-delay: 0.45s; }
+
+/* ===== SCROLL-TRIGGERED ANIMATIONS ===== */
+.scroll-trigger { 
+  opacity: 0; 
+  transform: translateY(20px); 
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out; 
+}
+
+.scroll-trigger.visible { 
+  opacity: 1; 
+  transform: translateY(0); 
+}
+
+/* ===== Z-INDEX LAYERS ===== */
+.z-dropdown { z-index: 50; }
+.z-sticky { z-index: 40; }
+.z-modal { z-index: 100; }
+.z-popover { z-index: 75; }
+.z-tooltip { z-index: 60; }
+
+/* ===== SMOOTH SCROLL ===== */
+html { 
+  scroll-behavior: smooth; 
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .animate-fade-in-up,
+  .animate-subtle-float,
+  .hover-lift,
+  .hover-lift-strong { 
+    animation: none !important; 
+    transform: none !important; 
+  }
+  
+  body { 
+    background: white; 
+  }
+  
+  .no-print { 
+    display: none !important; 
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

@@ -1,6 +1,6 @@
 /**
  * Store Pinia pour la gestion des candidatures
- * Version optimisée avec gestion d'état robuste
+ * Version avec création et suppression
  */
 
 import { defineStore } from 'pinia'
@@ -37,26 +37,14 @@ export const useCandidatureStore = defineStore('candidature', () => {
 
   // ==================== GETTERS ====================
   
-  /**
-   * Nombre total de candidatures
-   */
   const totalCandidatures = computed(() => pagination.value.totalItems)
   
-  /**
-   * Vérifie s'il y a une page suivante
-   */
   const hasNextPage = computed(() => 
     pagination.value.currentPage < pagination.value.totalPages
   )
   
-  /**
-   * Vérifie s'il y a une page précédente
-   */
   const hasPrevPage = computed(() => pagination.value.currentPage > 1)
   
-  /**
-   * Statistiques des candidatures par statut
-   */
   const statsParStatut = computed(() => {
     const stats: Record<string, number> = {}
     candidatures.value.forEach(c => {
@@ -67,50 +55,26 @@ export const useCandidatureStore = defineStore('candidature', () => {
 
   // ==================== ACTIONS ====================
   
-  /**
-   * Initialise le store (charge les statuts)
-   */
   const initialize = async () => {
-    if (initialized.value) {
-      console.log('📊 Store déjà initialisé')
-      return
-    }
-    
-    console.log('🚀 Initialisation du store...')
+    if (initialized.value) return
     await loadStatuts()
     initialized.value = true
   }
 
-  /**
-   * Charge les statuts
-   */
   const loadStatuts = async () => {
-    // Éviter les appels multiples
-    if (statuts.value.length > 0) {
-      console.log('📊 Statuts déjà chargés:', statuts.value.length)
-      return statuts.value
-    }
+    if (statuts.value.length > 0) return statuts.value
     
     loading.value = true
     error.value = null
     
     try {
-      console.log('📡 Chargement des statuts...')
       const data = await statutApi.getAll()
       statuts.value = data
-      console.log('✅ Statuts chargés:', statuts.value.length)
       return data
     } catch (err: any) {
-      console.error('❌ Erreur chargement statuts:', err)
       error.value = err.message || 'Impossible de charger les statuts'
-      
-      // Données par défaut
       statuts.value = [
-        { id: 1, nom: 'En attente', couleur: '#94a3b8', ordre: 1 },
-        { id: 2, nom: 'Entretien RH', couleur: '#3b82f6', ordre: 2 },
-        { id: 3, nom: 'Entretien technique', couleur: '#f59e0b', ordre: 3 },
-        { id: 4, nom: 'Accepté', couleur: '#10b981', ordre: 4 },
-        { id: 5, nom: 'Refusé', couleur: '#ef4444', ordre: 5 }
+      
       ]
       return statuts.value
     } finally {
@@ -118,22 +82,13 @@ export const useCandidatureStore = defineStore('candidature', () => {
     }
   }
 
-  /**
-   * Charge les candidatures
-   */
   const loadCandidatures = async () => {
-    // Protection contre les appels multiples
-    if (loading.value) {
-      console.log('⏳ Chargement déjà en cours...')
-      return
-    }
+    if (loading.value) return
     
     loading.value = true
     error.value = null
     
     try {
-      console.log('📡 Chargement des candidatures...', filters.value)
-      
       const result = await candidatureApi.getAll(filters.value)
       
       candidatures.value = result.data
@@ -144,15 +99,7 @@ export const useCandidatureStore = defineStore('candidature', () => {
         itemsPerPage: result.limit
       }
       
-      console.log('✅ Candidatures chargées:', {
-        count: candidatures.value.length,
-        total: pagination.value.totalItems,
-        page: pagination.value.currentPage,
-        pages: pagination.value.totalPages
-      })
-      
     } catch (err: any) {
-      console.error('❌ Erreur chargement candidatures:', err)
       error.value = err.message || 'Erreur lors du chargement'
       candidatures.value = []
     } finally {
@@ -160,19 +107,13 @@ export const useCandidatureStore = defineStore('candidature', () => {
     }
   }
 
-  /**
-   * Charge une candidature spécifique
-   */
   const loadCandidatureById = async (id: number) => {
     loading.value = true
     error.value = null
     
     try {
-      console.log('📡 Chargement candidature:', id)
       currentCandidature.value = await candidatureApi.getById(id)
-      console.log('✅ Candidature chargée:', currentCandidature.value?.nom)
     } catch (err: any) {
-      console.error('❌ Erreur chargement candidature:', err)
       error.value = err.message || 'Erreur lors du chargement'
       currentCandidature.value = null
     } finally {
@@ -181,14 +122,65 @@ export const useCandidatureStore = defineStore('candidature', () => {
   }
 
   /**
-   * Met à jour le statut d'une candidature
+   * Crée une nouvelle candidature
    */
+  const createCandidature = async (candidature: Omit<Candidature, 'id'>) => {
+    loading.value = true
+    error.value = null
+    
+    try {
+      const nouvelleCandidature = await candidatureApi.create(candidature)
+      
+      // Ajouter à la liste locale
+      candidatures.value = [nouvelleCandidature, ...candidatures.value]
+      
+      // Mettre à jour la pagination
+      pagination.value.totalItems += 1
+      pagination.value.totalPages = Math.ceil(pagination.value.totalItems / pagination.value.itemsPerPage)
+      
+      return nouvelleCandidature
+    } catch (err: any) {
+      error.value = err.message || 'Erreur lors de la création'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * Supprime une candidature
+   */
+  const deleteCandidature = async (id: number) => {
+    loading.value = true
+    error.value = null
+    
+    try {
+      await candidatureApi.delete(id)
+      
+      // Supprimer de la liste locale
+      candidatures.value = candidatures.value.filter(c => c.id !== id)
+      
+      // Mettre à jour la pagination
+      pagination.value.totalItems -= 1
+      pagination.value.totalPages = Math.ceil(pagination.value.totalItems / pagination.value.itemsPerPage)
+      
+      // Si on est sur la page de détail, rediriger
+      if (currentCandidature.value?.id === id) {
+        currentCandidature.value = null
+      }
+      
+    } catch (err: any) {
+      error.value = err.message || 'Erreur lors de la suppression'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   const updateStatut = async (id: number, nouveauStatut: string) => {
-    // Sauvegarder l'état pour rollback
     const previousCandidatures = [...candidatures.value]
     const previousCurrent = currentCandidature.value ? { ...currentCandidature.value } : null
     
-    // Optimistic update
     const index = candidatures.value.findIndex(c => c.id === id)
     if (index !== -1) {
       candidatures.value[index].statut = nouveauStatut
@@ -199,26 +191,16 @@ export const useCandidatureStore = defineStore('candidature', () => {
     }
     
     try {
-      console.log('📡 Mise à jour statut:', id, nouveauStatut)
       await candidatureApi.update(id, { statut: nouveauStatut })
-      console.log('✅ Statut mis à jour')
     } catch (err: any) {
-      console.error('❌ Erreur mise à jour statut:', err)
       error.value = err.message || 'Erreur lors de la mise à jour'
-      
-      // Rollback
       candidatures.value = previousCandidatures
       currentCandidature.value = previousCurrent
     }
   }
 
-  /**
-   * Ajoute un commentaire
-   */
   const ajouterCommentaire = async (id: number, contenu: string) => {
     try {
-      console.log('📡 Ajout commentaire:', id)
-      
       const commentaire = {
         auteur: 'Recruteur',
         date: new Date().toISOString(),
@@ -226,24 +208,17 @@ export const useCandidatureStore = defineStore('candidature', () => {
       }
       
       await candidatureApi.addCommentaire(id, commentaire)
-      console.log('✅ Commentaire ajouté')
       
-      // Recharger si c'est la candidature courante
       if (currentCandidature.value?.id === id) {
         await loadCandidatureById(id)
       }
       
     } catch (err: any) {
-      console.error('❌ Erreur ajout commentaire:', err)
       error.value = err.message || 'Erreur lors de l\'ajout'
     }
   }
 
-  /**
-   * Met à jour les filtres
-   */
   const setFilters = async (nouveauxFiltres: Partial<Filters>) => {
-    // Reset page si les filtres changent
     if (nouveauxFiltres.statut !== undefined || 
         nouveauxFiltres.poste !== undefined || 
         nouveauxFiltres.search !== undefined) {
@@ -251,14 +226,9 @@ export const useCandidatureStore = defineStore('candidature', () => {
     }
     
     filters.value = { ...filters.value, ...nouveauxFiltres }
-    console.log('🔍 Nouveaux filtres:', filters.value)
-    
     await loadCandidatures()
   }
 
-  /**
-   * Change de page
-   */
   const setPage = async (page: number) => {
     if (page < 1 || page > pagination.value.totalPages) return
     
@@ -266,9 +236,6 @@ export const useCandidatureStore = defineStore('candidature', () => {
     await loadCandidatures()
   }
 
-  /**
-   * Réinitialise les filtres
-   */
   const resetFilters = async () => {
     filters.value = {
       statut: '',
@@ -277,7 +244,6 @@ export const useCandidatureStore = defineStore('candidature', () => {
       page: 1,
       limit: 10
     }
-    console.log('🔄 Filtres réinitialisés')
     await loadCandidatures()
   }
 
@@ -302,6 +268,8 @@ export const useCandidatureStore = defineStore('candidature', () => {
     loadStatuts,
     loadCandidatures,
     loadCandidatureById,
+    createCandidature,
+    deleteCandidature,
     updateStatut,
     ajouterCommentaire,
     setFilters,

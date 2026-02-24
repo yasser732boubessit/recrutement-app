@@ -1,6 +1,6 @@
 /**
  * Service API pour communiquer avec JSON Server
- * Version optimisée avec gestion d'erreurs avancée
+ * Version avec création et suppression de candidatures
  */
 
 import axios from 'axios'
@@ -113,6 +113,20 @@ export const candidatureApi = {
   },
 
   /**
+   * Crée une nouvelle candidature
+   */
+  create: async (candidature: Omit<Candidature, 'id'>): Promise<Candidature> => {
+    try {
+      const response = await api.post<Candidature>('/candidatures', candidature)
+      console.log('✅ Candidature créée:', response.data)
+      return response.data
+    } catch (error) {
+      console.error('❌ Erreur création candidature:', error)
+      throw error
+    }
+  },
+
+  /**
    * Met à jour une candidature
    */
   update: async (id: number, data: Partial<Candidature>): Promise<Candidature> => {
@@ -126,20 +140,30 @@ export const candidatureApi = {
   },
 
   /**
+   * Supprime une candidature
+   */
+  delete: async (id: number): Promise<void> => {
+    try {
+      await api.delete(`/candidatures/${id}`)
+      console.log(`✅ Candidature ${id} supprimée`)
+    } catch (error) {
+      console.error(`❌ Erreur suppression ${id}:`, error)
+      throw error
+    }
+  },
+
+  /**
    * Ajoute un commentaire
    */
   addCommentaire: async (id: number, commentaire: Omit<Commentaire, 'id'>): Promise<Candidature> => {
     try {
-      // Récupérer la candidature
       const candidature = await candidatureApi.getById(id)
       
-      // Créer le nouveau commentaire
       const nouveauCommentaire = {
         ...commentaire,
-        id: Date.now() + Math.random() // ID unique
+        id: Date.now() + Math.random()
       }
       
-      // Mettre à jour
       const response = await api.patch<Candidature>(`/candidatures/${id}`, {
         commentaires: [...(candidature.commentaires || []), nouveauCommentaire]
       })
@@ -179,22 +203,14 @@ export const candidatureApi = {
 // ==================== SERVICE STATUTS ====================
 
 export const statutApi = {
-  /**
-   * Récupère tous les statuts
-   */
   getAll: async (): Promise<Statut[]> => {
     try {
       const response = await api.get<Statut[]>('/statuts')
       return response.data
     } catch (error) {
       console.error('Erreur statuts:', error)
-      // Données par défaut en cas d'erreur
       return [
-        { id: 1, nom: 'En attente', couleur: '#94a3b8', ordre: 1 },
-        { id: 2, nom: 'Entretien RH', couleur: '#3b82f6', ordre: 2 },
-        { id: 3, nom: 'Entretien technique', couleur: '#f59e0b', ordre: 3 },
-        { id: 4, nom: 'Accepté', couleur: '#10b981', ordre: 4 },
-        { id: 5, nom: 'Refusé', couleur: '#ef4444', ordre: 5 }
+ 
       ]
     }
   }
@@ -203,9 +219,6 @@ export const statutApi = {
 // ==================== SERVICE POSTES ====================
 
 export const posteApi = {
-  /**
-   * Récupère tous les postes
-   */
   getAll: async (): Promise<Poste[]> => {
     try {
       const response = await api.get<Poste[]>('/postes')
@@ -220,9 +233,6 @@ export const posteApi = {
 // ==================== SERVICE COMPÉTENCES ====================
 
 export const competenceApi = {
-  /**
-   * Récupère toutes les compétences
-   */
   getAll: async (): Promise<Competence[]> => {
     try {
       const response = await api.get<Competence[]>('/competences')
@@ -236,9 +246,6 @@ export const competenceApi = {
 
 // ==================== UTILITAIRES ====================
 
-/**
- * Vérifie le statut de l'API
- */
 export const checkApiStatus = async (): Promise<boolean> => {
   try {
     const response = await api.get('/candidatures?_limit=1')

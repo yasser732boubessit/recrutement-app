@@ -6,6 +6,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import DetailView from '../views/DetailView.vue'
+import AddCandidatureView from '../views/AddCandidatureView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -26,6 +27,10 @@ const router = createRouter({
       meta: {
         title: 'Détail Candidature'
       }
+    },{
+          path: '/ajouter',
+      name: 'add',
+      component: AddCandidatureView
     },
     {
       path: '/:pathMatch(.*)*',

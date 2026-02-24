@@ -1,18 +1,13 @@
 <!--
   HomeView - Page d'accueil premium avec Lucide Icons
-  Design System avec Tailwind v4 - Dimensions et espacements optimisés
-  Version corrigée - Contenu centré
+  Version avec bouton d'ajout et assistant de création multi-étapes
 -->
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  <div class="">
     
     <!-- ========== HERO SECTION ========== -->
-    <section class="relative bg-gradient-to-r from-blue-600 to-purple-700 pt-12 pb-8 px-4 md:px-8 overflow-hidden shadow-lg">
-      <!-- Background pattern décoratif -->
-      <div class="absolute inset-0 opacity-5" 
-           style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')">
-      </div>
+
       
       <!-- Contenu centré de la hero section -->
       <div class="relative z-10 max-w-7xl mx-auto">
@@ -25,13 +20,13 @@
         </div>
         
         <!-- Sous-titre avec date -->
-        <p class="text-white/90 text-lg font-light mb-18">
+        <p class="text-white/90 text-lg font-light mb-8">
           Gérez efficacement vos recrutements • {{ currentDate }}
         </p>
 
         <!-- Quick Stats Cards -->
         <div v-if="!store.loading && store.candidatures?.length" 
-             class="flex flex-wrap gap-4 justify-start md:justify-center mb-18">
+             class="flex flex-wrap gap-4 justify-start md:justify-center mb-8">
           
           <!-- Total Card -->
           <div @click="scrollToTop" 
@@ -78,7 +73,8 @@
       
       <!-- Résultats de recherche et contrôles de vue -->
       <div v-if="!store.loading && store.candidatures?.length" 
-           class="flex justify-between items-center mb-6">
+           class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        
         <!-- Compteur de résultats -->
         <div class="flex items-center gap-2">
           <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-semibold text-sm border border-blue-200">
@@ -89,22 +85,35 @@
           </span>
         </div>
         
-        <!-- Toggle Grille/Liste -->
-        <div class="flex gap-2 bg-white p-1 rounded-xl shadow-sm">
-          <button @click="viewMode = 'grid'"
-                  class="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2"
-                  :class="viewMode === 'grid' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'"
-                  title="Vue grille">
-            <LayoutGrid class="w-5 h-5" />
-            <span class="hidden sm:inline">Grille</span>
+        <!-- Actions -->
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+     
+          
+          <!-- Toggle Grille/Liste -->
+          <div class="flex gap-2 bg-white p-1 rounded-xl shadow-sm">
+                 <!-- Bouton Ajouter -->
+          <button @click="goToAddPage"
+                  class="flex-1 sm:flex-none px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium 
+                         hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-sm hover:shadow-md">
+            <Plus class="w-4 h-4" />
+            <span>Créer </span>
           </button>
-          <button @click="viewMode = 'list'"
-                  class="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2"
-                  :class="viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'"
-                  title="Vue liste">
-            <List class="w-5 h-5" />
-            <span class="hidden sm:inline">Liste</span>
-          </button>
+            
+            <button @click="viewMode = 'grid'"
+                    class="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2"
+                    :class="viewMode === 'grid' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'"
+                    title="Vue grille">
+              <LayoutGrid class="w-5 h-5" />
+              <span class="hidden sm:inline">Grille</span>
+            </button>
+            <button @click="viewMode = 'list'"
+                    class="px-4 py-2 rounded-lg transition-all duration-200 flex items-center gap-2"
+                    :class="viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'"
+                    title="Vue liste">
+              <List class="w-5 h-5" />
+              <span class="hidden sm:inline">Liste</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -141,10 +150,12 @@
             </div>
             <h3 class="text-2xl text-gray-800 font-bold mb-2">Aucune candidature trouvée</h3>
             <p class="text-gray-500 mb-6 text-sm">Essayez de modifier vos filtres ou revenez plus tard</p>
-            <button @click="handleResetFilters" 
-                    class="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-6 py-2.5 rounded-lg hover:bg-gray-200 transition-colors duration-200">
-              <RotateCw class="w-4 h-4" />
-              Réinitialiser les filtres
+            
+            <!-- Bouton pour créer la première candidature -->
+            <button @click="showAddModal = true" 
+                    class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm">
+              <Plus class="w-4 h-4" />
+              Créer une candidature
             </button>
           </div>
         </div>
@@ -163,6 +174,7 @@
               :key="candidature.id"
               :candidature="candidature"
               @status-change="handleStatusChange"
+              @delete="handleDeleteCandidature"
               class="cursor-pointer"
             />
           </TransitionGroup>
@@ -181,6 +193,43 @@
       </div>
     </main>
 
+ 
+
+    <!-- ========== MODAL DE CONFIRMATION SUPPRESSION ========== -->
+    <Teleport to="body">
+      <Transition name="fade">
+        <div v-if="showDeleteConfirm" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <!-- Overlay -->
+          <div class="absolute inset-0 bg-black/40" @click="showDeleteConfirm = false"></div>
+          
+          <!-- Modal -->
+          <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div class="text-center">
+              <div class="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                <AlertTriangle class="w-6 h-6 text-red-600" />
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Confirmer la suppression</h3>
+              <p class="text-sm text-gray-500 mb-6">
+                Êtes-vous sûr de vouloir supprimer cette candidature ? Cette action est irréversible.
+              </p>
+              <div class="flex gap-3 justify-center">
+                <button @click="showDeleteConfirm = false"
+                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                  Annuler
+                </button>
+                <button @click="confirmDelete"
+                        :disabled="deleteLoading"
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2">
+                  <Loader2 v-if="deleteLoading" class="w-4 h-4 animate-spin" />
+                  {{ deleteLoading ? 'Suppression...' : 'Supprimer' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
     <!-- ========== SCROLL TO TOP BUTTON ========== -->
     <Transition name="slide-up">
       <button v-if="showScrollTop" 
@@ -190,8 +239,6 @@
         <ChevronUp class="w-6 h-6" />
       </button>
     </Transition>
-   </section>
-
   </div>
 </template>
 
@@ -202,7 +249,7 @@ import { useCandidatureStore } from '../stores/candidatureStore'
 import FiltersBar from '../components/FiltersBar.vue'
 import CandidatureCard from '../components/CandidatureCard.vue'
 import Pagination from '../components/Pagination.vue'
-import type { Filters } from '../types'
+import type { Candidature, Filters } from '../types'
 
 // Imports Lucide Icons
 import { 
@@ -219,7 +266,9 @@ import {
   Handshake,
   Laptop,
   CheckCircle,
-  XCircle
+  XCircle,
+  Plus,
+  AlertTriangle
 } from 'lucide-vue-next'
 
 // ========== STORES & ROUTER ==========
@@ -229,6 +278,10 @@ const store = useCandidatureStore()
 // ========== STATE ==========
 const viewMode = ref<'grid' | 'list'>('grid')
 const showScrollTop = ref(false)
+const showAddModal = ref(false)
+const showDeleteConfirm = ref(false)
+const deleteLoading = ref(false)
+const candidatureToDelete = ref<number | null>(null)
 
 // ========== COMPUTED ==========
 const currentDate = computed(() => {
@@ -273,7 +326,10 @@ watch(viewMode, (newMode) => {
 const handleScroll = () => {
   showScrollTop.value = window.scrollY > 400
 }
-
+// Dans les méthodes
+const goToAddPage = () => {
+  router.push('/ajouter')
+}
 /**
  * Retourne le composant d'icône correspondant au statut
  */
@@ -328,6 +384,67 @@ const handleResetFilters = async () => {
  */
 const handleStatusChange = async (id: number, newStatus: string) => {
   await store.updateStatut(id, newStatus)
+  
+  // Afficher une notification
+  if (typeof window !== 'undefined' && (window as any).showNotification) {
+    (window as any).showNotification('Statut mis à jour avec succès', 'success')
+  }
+}
+
+/**
+ * Gère la suppression d'une candidature (ouvre la confirmation)
+ */
+const handleDeleteCandidature = (id: number) => {
+  candidatureToDelete.value = id
+  showDeleteConfirm.value = true
+}
+
+/**
+ * Confirme la suppression
+ */
+const confirmDelete = async () => {
+  if (!candidatureToDelete.value) return
+  
+  deleteLoading.value = true
+  try {
+    await store.deleteCandidature(candidatureToDelete.value)
+    
+    // Afficher une notification
+    if (typeof window !== 'undefined' && (window as any).showNotification) {
+      (window as any).showNotification('Candidature supprimée avec succès', 'success')
+    }
+    
+    showDeleteConfirm.value = false
+    candidatureToDelete.value = null
+  } catch (error) {
+    console.error('Erreur suppression:', error)
+    if (typeof window !== 'undefined' && (window as any).showNotification) {
+      (window as any).showNotification('Erreur lors de la suppression', 'error')
+    }
+  } finally {
+    deleteLoading.value = false
+  }
+}
+
+/**
+ * Gère la création d'une nouvelle candidature
+ */
+const handleCreateCandidature = async (candidature: Omit<Candidature, 'id'>) => {
+  try {
+    await store.createCandidature(candidature)
+    
+    // Afficher une notification
+    if (typeof window !== 'undefined' && (window as any).showNotification) {
+      (window as any).showNotification('Candidature créée avec succès', 'success')
+    }
+    
+    showAddModal.value = false
+  } catch (error) {
+    console.error('Erreur création:', error)
+    if (typeof window !== 'undefined' && (window as any).showNotification) {
+      (window as any).showNotification('Erreur lors de la création', 'error')
+    }
+  }
 }
 
 /**
@@ -336,13 +453,6 @@ const handleStatusChange = async (id: number, newStatus: string) => {
 const handlePageChange = async (page: number) => {
   await store.setPage(page)
   scrollToTop()
-}
-
-/**
- * Navigue vers le détail d'une candidature
- */
-const goToDetail = (id: number) => {
-  router.push(`/candidature/${id}`)
 }
 
 /**
@@ -361,9 +471,8 @@ const scrollToTop = () => {
 </script>
 
 <style scoped>
-/* ========== ANIMATIONS PERSONNALISÉES ========== */
+/* ========== ANIMATIONS ========== */
 
-/* Animation de secousse pour l'erreur */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
@@ -374,9 +483,7 @@ const scrollToTop = () => {
   animation: shake 0.5s ease-in-out;
 }
 
-/* ========== TRANSITIONS ========== */
-
-/* Transition Fade */
+/* Transitions */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -387,7 +494,6 @@ const scrollToTop = () => {
   opacity: 0;
 }
 
-/* Transition pour la grille */
 .grid-animation-enter-active,
 .grid-animation-leave-active {
   transition: all 0.3s ease;
@@ -403,7 +509,6 @@ const scrollToTop = () => {
   transform: scale(0.8);
 }
 
-/* Transition pour la liste */
 .list-animation-enter-active,
 .list-animation-leave-active {
   transition: all 0.3s ease;
@@ -419,7 +524,6 @@ const scrollToTop = () => {
   transform: translateX(30px);
 }
 
-/* Transition pour le bouton slide-up */
 .slide-up-enter-active,
 .slide-up-leave-active {
   transition: all 0.3s ease;
@@ -439,7 +543,8 @@ const scrollToTop = () => {
   }
   
   .filters-bar,
-  .scroll-top-btn {
+  .scroll-top-btn,
+  button {
     display: none !important;
   }
 }

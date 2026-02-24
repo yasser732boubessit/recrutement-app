@@ -7,7 +7,7 @@ import axios from 'axios'
 import type { Candidature, Commentaire, Filters, ApiResponse, Statut, Poste, Competence } from '../types'
 
 // Configuration de base
-const API_BASE_URL = 'http://localhost:3000'
+const API_BASE_URL = 'https://recrutement-api.onrender.com'
 
 const api = axios.create({
   baseURL: API_BASE_URL,

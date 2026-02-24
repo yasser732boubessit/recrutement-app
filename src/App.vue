@@ -1,72 +1,78 @@
 <!--
   App - Composant principal de l'application
   Layout global avec navigation, notifications et footer
-  Version avec Lucide Icons et Design System
+  Version avec header et footer redesignés pour harmonie avec le background
 -->
 
 <template>
-  <div class="min-h-screen flex flex-col bg-gray-50">
+  <div class="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
     
-    <!-- ========== NAVIGATION PRINCIPALE ========== -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <!-- ========== HEADER PRINCIPAL ========== -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-white/20 sticky top-0 z-50 shadow-lg">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           
-          <!-- Logo -->
-          <router-link to="/" class="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors">
-            <ClipboardList class="w-6 h-6" />
-            <span class="font-semibold text-lg">Gestion Recrutement</span>
+          <!-- Logo avec effet de glow -->
+          <router-link to="/" class="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-all duration-300 hover:scale-105">
+            <div class="relative">
+              <ClipboardList class="w-7 h-7" />
+              <div class="absolute -inset-1 bg-blue-400 rounded-full blur-md opacity-0 hover:opacity-30 transition-opacity"></div>
+            </div>
+            <span class="font-bold text-lg bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Gestion Recrutement
+            </span>
           </router-link>
           
           <!-- Navigation Links -->
           <nav class="flex items-center gap-6">
             <router-link 
               to="/" 
-              class="text-sm font-medium transition-colors relative group"
-              :class="$route.path === '/' ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900'"
+              class="text-sm font-medium transition-all duration-300 relative px-3 py-2 rounded-lg"
+              :class="$route.path === '/' 
+                ? 'text-white bg-gradient-to-r from-blue-600 to-purple-600 shadow-md' 
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'"
             >
-              Accueil
-              <span v-if="$route.path === '/'" 
-                    class="absolute -bottom-1 left-0 w-full h-0.5 bg-blue-600 rounded-full"></span>
+              <span class="relative z-10">Accueil</span>
             </router-link>
             
             <!-- Statistiques Toggle -->
             <button 
               @click="toggleStats"
-              class="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+              class="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 
+                     transition-all duration-300 px-3 py-2 rounded-lg hover:bg-gray-100 group"
             >
-              <BarChart3 class="w-4 h-4" />
+              <BarChart3 class="w-4 h-4 group-hover:rotate-12 transition-transform" />
               Statistiques
             </button>
           </nav>
         </div>
       </div>
     </header>
-    <section class="relative bg-gradient-to-r from-blue-600 to-purple-700 pt-12 pb-8 px-4 md:px-8 overflow-hidden shadow-lg">
-      <!-- Background pattern décoratif -->
-      <div class="absolute inset-0 opacity-5" 
-           style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')">
-      </div>
-    <!-- ========== STATISTIQUES (optionnel) ========== -->
+
+    <!-- ========== STATISTIQUES DÉROULANTES ========== -->
     <Transition name="slide-down">
-      <div v-if="showStats" class="bg-white border-b border-gray-200 py-4">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex items-center justify-between">
-            <h2 class="text-sm font-semibold text-gray-700">Aperçu rapide</h2>
-            <button @click="showStats = false" class="text-gray-400 hover:text-gray-600">
+      <div v-if="showStats" class="bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+              <BarChart3 class="w-4 h-4 text-blue-500" />
+              Aperçu rapide
+            </h2>
+            <button @click="showStats = false" 
+                    class="text-gray-400 hover:text-gray-600 transition-colors hover:rotate-90 duration-300">
               <X class="w-4 h-4" />
             </button>
           </div>
           
           <!-- Stats Cards Mini -->
-          <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mt-3">
-            <div class="bg-blue-50 rounded-lg p-3">
-              <p class="text-xs text-blue-600 font-medium">Total</p>
-              <p class="text-lg font-bold text-blue-700">{{ store.totalCandidatures }}</p>
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-3 shadow-md hover:shadow-lg transition-all hover:-translate-y-1">
+              <p class="text-xs text-blue-100 font-medium">Total</p>
+              <p class="text-xl font-bold text-white">{{ store.totalCandidatures }}</p>
             </div>
             <div v-for="(count, statut) in store.statsParStatut" 
                  :key="statut"
-                 class="bg-gray-50 rounded-lg p-3">
+                 class="bg-white rounded-lg p-3 shadow-sm border border-gray-100 hover:shadow-md transition-all hover:-translate-y-1">
               <p class="text-xs text-gray-600 font-medium">{{ statut }}</p>
               <p class="text-lg font-bold" :class="getStatutTextClass(statut)">{{ count }}</p>
             </div>
@@ -75,21 +81,53 @@
       </div>
     </Transition>
 
+    <!-- ========== HERO SECTION DYNAMIQUE ========== -->
+    <section class="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 py-16 px-4 md:px-8 overflow-hidden">
+      <!-- Background pattern amélioré -->
+      <div class="absolute inset-0 opacity-10" 
+           style="background-image: url('data:image/svg+xml,%3Csvg width=\'80\' height=\'80\' viewBox=\'0 0 80 80\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M50 50v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-40V0h-2v4h-4v2h4v4h2V6h4V4h-4zM10 50v-4H8v4H4v2h4v4h2v-4h4v-2h-4zM10 10V0H8v4H4v2h4v4h2V6h4V4h-4z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')">
+      </div>
+      
+      <!-- Cercles décoratifs -->
+      <div class="absolute top-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+      
+  <!-- Hero Section - utilisation directe des utilities -->
+<div class="relative z-10 max-w-7xl mx-auto text-center">
+  
+  <!-- Logo et Titre -->
+  <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+    <div class="relative">
+      <ClipboardList class="w-16 h-16 md:w-20 md:h-20 text-white animate-float" />
+      <div class="absolute -inset-2 bg-white/20 rounded-full blur-xl animate-pulse-soft"></div>
+    </div>
+    
+    <!-- ✅ Utilisation directe des classes Tailwind + font-titillium -->
+    <h1 class="font-titillium text-4xl md:text-5xl lg:text-6xl font-bold text-white drop-shadow-2xl leading-tight">
+      Gestion des Candidatures
+    </h1>
+  </div>
+
+  <!-- ✅ Sous-titre avec classes directes -->
+  <p class="font-titillium text-white/90 text-base sm:text-lg md:text-xl font-light leading-relaxed max-w-2xl mx-auto px-4 sm:px-0">
+    Plateforme moderne de gestion des recrutements • {{ currentDate }}
+  </p>
+</div>
+
     <!-- ========== TOAST NOTIFICATION ========== -->
     <Transition name="slide-right">
       <div v-if="notification.show" 
-           class="fixed top-20 right-4 z-50 max-w-md"
-           :class="notification.type">
-        <div class="flex items-center gap-3 p-4 rounded-lg shadow-lg"
+           class="fixed top-24 right-4 z-50 max-w-md">
+        <div class="flex items-center gap-3 p-4 rounded-xl shadow-2xl backdrop-blur-sm"
              :class="{
-               'bg-green-50 text-green-800 border border-green-200': notification.type === 'success',
-               'bg-red-50 text-red-800 border border-red-200': notification.type === 'error',
-               'bg-blue-50 text-blue-800 border border-blue-200': notification.type === 'info'
+               'bg-green-500/90 text-white border border-green-400': notification.type === 'success',
+               'bg-red-500/90 text-white border border-red-400': notification.type === 'error',
+               'bg-blue-500/90 text-white border border-blue-400': notification.type === 'info'
              }">
           <component :is="getNotificationIcon(notification.type)" class="w-5 h-5" />
           <p class="text-sm font-medium">{{ notification.message }}</p>
-          <button @click="notification.show = false" class="ml-auto">
-            <X class="w-4 h-4 opacity-60 hover:opacity-100" />
+          <button @click="notification.show = false" class="ml-auto hover:opacity-80">
+            <X class="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -106,24 +144,39 @@
     </section>
 
     <!-- ========== FOOTER ========== -->
-    <footer class="bg-white border-t border-gray-200 py-6 mt-auto">
+    <footer class="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-8 mt-auto border-t border-gray-700">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-          <p class="text-sm text-gray-500">
-            © 2026 - Gestion des Candidatures - Test Technique Vue.js
-          </p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+              <ClipboardList class="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <p class="text-sm text-gray-300">
+                © 2026 - Gestion des Candidatures
+              </p>
+              <p class="text-xs text-gray-400">Test Technique Vue.js</p>
+            </div>
+          </div>
           
-          <!-- API Status -->
-          <div class="flex items-center gap-2">
-            <span class="text-sm text-gray-500">API Status:</span>
-            <div class="flex items-center gap-1.5">
-              <div class="w-2 h-2 rounded-full animate-pulse"
-                   :class="apiStatus ? 'bg-green-500' : 'bg-red-500'"></div>
-              <span class="text-sm font-medium"
-                    :class="apiStatus ? 'text-green-600' : 'text-red-600'">
-                {{ apiStatus ? 'Connecté' : 'Déconnecté' }}
+          <!-- API Status amélioré -->
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 bg-gray-700/50 px-4 py-2 rounded-full">
+              <div class="relative">
+                <div class="w-3 h-3 rounded-full"
+                     :class="apiStatus ? 'bg-green-400' : 'bg-red-400'"></div>
+                <div class="absolute -inset-1 rounded-full animate-ping opacity-75"
+                     :class="apiStatus ? 'bg-green-400' : 'bg-red-400'"></div>
+              </div>
+              <span class="text-sm font-medium">
+                API {{ apiStatus ? 'Connectée' : 'Déconnectée' }}
               </span>
             </div>
+            
+            <!-- Version badge -->
+            <span class="text-xs px-3 py-1 bg-gray-700 rounded-full text-gray-300">
+              v2.0.0
+            </span>
           </div>
         </div>
       </div>
@@ -136,7 +189,7 @@
  * App - Composant racine avec Design System
  */
 
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCandidatureStore } from './stores/candidatureStore'
 
@@ -164,6 +217,14 @@ const notification = ref({
 })
 
 let statusInterval: number
+
+// ========== COMPUTED ==========
+const currentDate = computed(() => {
+  return new Date().toLocaleDateString('fr-FR', { 
+    month: 'long', 
+    year: 'numeric' 
+  })
+})
 
 // ========== METHODS ==========
 
@@ -256,10 +317,20 @@ if (typeof window !== 'undefined') {
 </script>
 
 <style scoped>
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
 /* Transitions */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s ease;
 }
 
 .fade-enter-from,
@@ -275,7 +346,7 @@ if (typeof window !== 'undefined') {
 .slide-down-enter-from,
 .slide-down-leave-to {
   opacity: 0;
-  transform: translateY(-10px);
+  transform: translateY(-20px);
 }
 
 .slide-right-enter-active,
@@ -303,16 +374,12 @@ if (typeof window !== 'undefined') {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Styles pour les liens actifs */
-.router-link-active {
-  color: #2563eb;
-}
-
 /* Print styles */
 @media print {
   header,
   footer,
-  .toast {
+  .toast,
+  section {
     display: none !important;
   }
 }

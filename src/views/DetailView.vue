@@ -1,24 +1,17 @@
 <!--
   DetailView - Page de détail d'une candidature
   Version premium avec Design System et Lucide Icons
-  Layout optimisé pour une expérience de lecture confortable
+  Layout optimisé avec bouton retour stylisé
 -->
 
 <template>
+  <div class="">
+    
+  
 
-      <section class="">
-      <!-- Background pattern décoratif -->
-      <div class="absolute inset-0 opacity-5" 
-           style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')">
-      </div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  
 
-      <!-- ========== BOUTON RETOUR ========== -->
-      <button @click="goBack" 
-              class="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors mb-6 group">
-        <ArrowLeft class="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-        <span class="text-sm font-medium">Retour à la liste</span>
-      </button>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
       <!-- ========== ÉTATS DE CHARGEMENT ========== -->
       <div v-if="store.loading" class="flex flex-col items-center justify-center py-20">
@@ -191,11 +184,23 @@
             @add-comment="handleAddComment"
           />
         </div>
+<!-- ========== BOUTON RETOUR AU CENTRE ========== -->
+<Transition name="slide-up">
+  <button 
+    @click="goBack"
+    class="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-white text-blue-600 rounded-full shadow-lg border border-gray-200 
+           hover:bg-blue-600 hover:text-white hover:border-blue-600 hover:-translate-y-2 
+           transition-all duration-300 z-50 flex items-center justify-center group"
+    title="Retour à la liste"
+  >
+    <ArrowLeft class="w-6 h-6 group-hover:-translate-x-1 transition-transform duration-300" />
+  </button>
+</Transition>
       </div>
+
     </div>
     
-     </section>
-
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -283,7 +288,7 @@ const updateStatus = async () => {
     
     // Afficher une notification de succès
     if (typeof window !== 'undefined' && (window as any).showNotification) {
-      ;(window as any).showNotification('Statut mis à jour avec succès', 'success')
+      (window as any).showNotification('Statut mis à jour avec succès', 'success')
     }
   }
 }
@@ -347,8 +352,29 @@ const formatSalary = (salary: number): string => {
   animation: spin 1s linear infinite;
 }
 
-/* Transitions pour le bouton retour */
-button .w-4 {
-  transition: transform 0.2s ease;
+/* Transition pour le bouton retour */
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-right-enter-from {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+/* Animation pour l'icône du bouton retour */
+.group:hover .group-hover\:-translate-x-1 {
+  transform: translateX(-4px);
+}
+
+/* Transition pour les cartes */
+.hover\:shadow-md {
+  transition: box-shadow 0.3s ease;
 }
 </style>

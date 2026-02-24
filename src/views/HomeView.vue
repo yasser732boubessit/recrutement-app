@@ -12,17 +12,7 @@
       <!-- Contenu centré de la hero section -->
       <div class="relative z-10 max-w-7xl mx-auto">
         <!-- Titre avec icône animée -->
-        <div class="flex items-center gap-4 mb-4">
-          <ClipboardList class="w-10 h-10 md:w-12 md:h-12 text-white animate-bounce" />
-          <h1 class="text-3xl md:text-5xl font-bold text-white drop-shadow-lg">
-            Gestion des Candidatures
-          </h1>
-        </div>
-        
-        <!-- Sous-titre avec date -->
-        <p class="text-white/90 text-lg font-light mb-8">
-          Gérez efficacement vos recrutements • {{ currentDate }}
-        </p>
+
 
         <!-- Quick Stats Cards -->
         <div v-if="!store.loading && store.candidatures?.length" 

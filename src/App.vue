@@ -15,7 +15,7 @@
           <!-- Logo avec effet de glow -->
           <router-link to="/" class="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-all duration-300 hover:scale-105">
             <div class="relative">
-              <ClipboardList class="w-7 h-7" />
+                <img :src="ViteLogo" class="w-10 h-10" alt="Logo" />
               <div class="absolute -inset-1 bg-blue-400 rounded-full blur-md opacity-0 hover:opacity-30 transition-opacity"></div>
             </div>
             <span class="font-bold text-lg bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -98,7 +98,9 @@
   <!-- Logo et Titre -->
   <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
     <div class="relative">
-      <ClipboardList class="w-16 h-16 md:w-20 md:h-20 text-white animate-float" />
+  <div class="w-18 h-18  rounded-xl flex items-center justify-center shadow-lg">
+    <img :src="ViteLogo" class="w-16 h-16" alt="Logo" />
+  </div>
       <div class="absolute -inset-2 bg-white/20 rounded-full blur-xl animate-pulse-soft"></div>
     </div>
     
@@ -149,7 +151,7 @@
         <div class="flex flex-col md:flex-row justify-between items-center gap-4">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <ClipboardList class="w-5 h-5 text-white" />
+                <img :src="ViteLogo" class="w-5 h-5" alt="Logo" />
             </div>
             <div>
               <p class="text-sm text-gray-300">
@@ -192,7 +194,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCandidatureStore } from './stores/candidatureStore'
-
+import ViteLogo from './vite.svg'
 // Imports Lucide Icons
 import { 
   ClipboardList,
